@@ -2,6 +2,7 @@ import tkinter as tk
 import random
 import math
 import os
+import sys
 import json
 from PIL import Image, ImageTk, ImageSequence
 
@@ -12,6 +13,29 @@ FPS = 60
 PLAYER_SIZE = 90
 SAVE_FILE = "save.json"
 SETTINGS_FILE = "settings.json"
+
+
+def resource_path(name):
+    """Ищет файл рядом со скриптом или внутри .exe (PyInstaller)."""
+    if getattr(sys, "frozen", False):
+        base_dir = sys._MEIPASS
+    else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+    for ext in ("", ".png", ".gif", ".jpg", ".jpeg", ".webp"):
+        path = os.path.join(base_dir, name + ext) if ext else os.path.join(base_dir, name)
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def user_data_path(filename):
+    """Путь для сохранений — всегда рядом с .exe / .py."""
+    if getattr(sys, "frozen", False):
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_dir, filename)
+
 
 THEMES = {
     "dark": {
@@ -233,8 +257,7 @@ class SkibidiGame:
         return THEMES[self.theme_name]
 
     def settings_path(self):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.join(base_dir, SETTINGS_FILE)
+        return user_data_path(SETTINGS_FILE)
 
     def save_settings(self):
         try:
@@ -257,8 +280,7 @@ class SkibidiGame:
             print("Ошибка загрузки настроек:", e)
 
     def save_path(self):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.join(base_dir, SAVE_FILE)
+        return user_data_path(SAVE_FILE)
 
     def has_save(self):
         return os.path.exists(self.save_path())
@@ -334,16 +356,8 @@ class SkibidiGame:
         except Exception as e:
             print("Ошибка удаления сохранения:", e)
 
-    def find_image(self, name):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        for ext in (".png", ".gif", ".jpg", ".jpeg", ".webp"):
-            path = os.path.join(base_dir, name + ext)
-            if os.path.exists(path):
-                return path
-        return None
-
     def load_mellchar(self):
-        path = self.find_image("mellchar")
+        path = resource_path("mellchar")
         if path:
             try:
                 pil = Image.open(path).convert("RGBA")
@@ -357,7 +371,7 @@ class SkibidiGame:
                 print("Ошибка загрузки mellchar:", e)
 
     def load_mellchar2(self):
-        path = self.find_image("mellchar2")
+        path = resource_path("mellchar2")
         if path:
             try:
                 pil = Image.open(path).convert("RGBA")
@@ -371,7 +385,7 @@ class SkibidiGame:
                 print("Ошибка загрузки mellchar2:", e)
 
     def load_mellchar3(self):
-        path = self.find_image("mellchar3")
+        path = resource_path("mellchar3")
         if path:
             try:
                 pil = Image.open(path).convert("RGBA")
@@ -385,7 +399,7 @@ class SkibidiGame:
                 print("Ошибка загрузки mellchar3:", e)
 
     def load_mellchar4(self):
-        path = self.find_image("mellchar4")
+        path = resource_path("mellchar4")
         if path:
             try:
                 pil = Image.open(path).convert("RGBA")
@@ -399,7 +413,7 @@ class SkibidiGame:
                 print("Ошибка загрузки mellchar4:", e)
 
     def load_mellchar5(self):
-        path = self.find_image("mellchar5")
+        path = resource_path("mellchar5")
         if path:
             try:
                 pil = Image.open(path).convert("RGBA")
@@ -413,7 +427,7 @@ class SkibidiGame:
                 print("Ошибка загрузки mellchar5:", e)
 
     def load_mellloadback(self):
-        path = self.find_image("mellloadback")
+        path = resource_path("mellloadback")
         if path:
             try:
                 pil = Image.open(path).convert("RGBA")
@@ -709,65 +723,36 @@ class SkibidiGame:
     def draw_credits(self):
         self.canvas.create_rectangle(0, 0, WIDTH, HEIGHT, fill="#000000", outline="")
 
-        self.canvas.create_text(WIDTH // 2, 60,
-                                text="ГЛАВА 1",
-                                fill="#8a8a9a", font=("Courier New", 16, "bold"))
-
-        self.canvas.create_text(WIDTH // 2, 95,
-                                text="СКИБИДИ ТРП",
-                                fill="#8ff0ff", font=("Impact", 36, "bold"))
-
-        self.canvas.create_text(WIDTH // 2, 135,
-                                text="Путешествие по мультивселенным",
-                                fill="#ffffff", font=("Courier New", 16, "bold"))
-
-        self.canvas.create_text(WIDTH // 2, 165,
-                                text="Замок СТРП",
-                                fill="#c88aff", font=("Courier New", 14, "bold"))
-
-        self.canvas.create_line(200, 190, WIDTH - 200, 190, fill="#444444", width=1)
-
-        # Маска — обрезаем всё, что ниже 210 и выше нижнего края
         lines = [
             ("─" * 30, "#444444", 20),
             ("", "", 10),
-
             ("КОДИЛ", "#ffe066", 28),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("МОНТАЖИЛ", "#ffe066", 28),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("КАТ-СЦЕНА", "#ffe066", 28),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("СЮЖЕТ", "#ffe066", 28),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("ОСОБАЯ БЛАГОДАРНОСТЬ", "#ffe066", 22),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("ГРАФИКА", "#ffe066", 22),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("ЗВУК", "#ffe066", 22),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("ИДЕЯ", "#ffe066", 22),
             ("Крол", "#ffffff", 16),
             ("", "", 20),
-
             ("РЕЖИССЁР", "#ffe066", 22),
             ("Крол", "#ffffff", 16),
             ("", "", 40),
-
             ("В ГЛАВНЫХ РОЛЯХ", "#ffe066", 22),
             ("Крол", "#ffffff", 16),
             ("Иса", "#8a8a9a", 14),
@@ -777,13 +762,10 @@ class SkibidiGame:
             ("Хомяк", "#8a8a9a", 14),
             ("Степан", "#8a8a9a", 14),
             ("", "", 40),
-
             ("─" * 30, "#444444", 20),
             ("", "", 20),
-
             ("2026", "#ffffff", 20),
             ("СЕНТЯБРЬ", "#8a8a9a", 16),
-
             ("", "", 60),
             ("КОНЕЦ ПЕРВОЙ ГЛАВЫ", "#8ff0ff", 20),
             ("", "", 100),
@@ -798,11 +780,11 @@ class SkibidiGame:
                                         font=("Courier New", size, "bold"))
             y += size + 12
 
-        # Верхняя и нижняя заливки, чтобы текст "выезжал" и "уезжал"
-        self.canvas.create_rectangle(0, 0, WIDTH, 200, fill="#000000", outline="")
-        self.canvas.create_rectangle(0, 60, WIDTH, 200, fill="", outline="")
+        # затемнение сверху и снизу, чтобы текст выезжал из черноты
+        self.canvas.create_rectangle(0, 0, WIDTH, 55, fill="#000000", outline="")
+        self.canvas.create_rectangle(0, HEIGHT - 40, WIDTH, HEIGHT, fill="#000000", outline="")
 
-        # Перерисовка заголовка поверх заливки
+        # фиксированный заголовок сверху
         self.canvas.create_text(WIDTH // 2, 60,
                                 text="ГЛАВА 1",
                                 fill="#8a8a9a", font=("Courier New", 16, "bold"))
@@ -816,9 +798,6 @@ class SkibidiGame:
                                 text="Замок СТРП",
                                 fill="#c88aff", font=("Courier New", 14, "bold"))
         self.canvas.create_line(200, 190, WIDTH - 200, 190, fill="#444444", width=1)
-
-        # Верхняя чёрная маска (обрезаем текст выше заголовка)
-        self.canvas.create_rectangle(0, 0, WIDTH, 55, fill="#000000", outline="")
 
         self.canvas.create_text(WIDTH - 20, HEIGHT - 20,
                                 text="[ПРОБЕЛ] пропустить титры",
@@ -2589,19 +2568,12 @@ class SkibidiGame:
         ], None)
 
     def load_cutscene_frames(self, name):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        path = None
-        ext_found = None
-        for ext in (".gif", ".png", ".jpg", ".jpeg", ".webp"):
-            candidate = os.path.join(base_dir, name + ext)
-            if os.path.exists(candidate):
-                path = candidate
-                ext_found = ext
-                break
-
+        path = resource_path(name)
         if not path:
             print("[CUTSCENE] файл не найден:", name)
             return False
+
+        ext_found = os.path.splitext(path)[1].lower()
 
         try:
             img = Image.open(path)
